@@ -1,91 +1,77 @@
-import React, {useState,useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import './App.css'
 
 
 function App() {
-  const [city , setCity] = useState('')
-  const [cityKey, setCityKey]= useState(0)
+  const [city , setCity] = useState('');
+  const [cityKey, setCityKey] = useState(0);
+  const [detail, setDetail] = useState({});
   
   const keyApi = 'UwBxLkrA0V3EjRDmR85ccshr6t9D8RhI';
 
   async function getCity() {
 
-    const request = new Request('http://dataservice.accuweather.com/locations/v1/cities/search', {
-      method: 'GET',
-      headers: new Headers({
-        Accept: 'application/json',
-        'Content-Type': 'appliaction/json',
-      }),
-    })
-    console.log(request)
+    const request = 'http://dataservice.accuweather.com/locations/v1/cities/search'
     const query = `?apikey=${keyApi}&q=${city}`;
-    const response = await fetch(request.url + query)
-    console.log(response)
+    const response = await fetch(request + query)
+    
     const data = await response.json()
-    const cities = data[0]
-    const cityKey = cities.Key
+    const cities = new Object(data[0])
     
-    setCityKey(cityKey)
-
-    console.log(data)
-    
+    setCityKey(cities.Key)
+    // console.log(cityKey)
+    return cityKey
   }
 
   async function getWeather() {
-    const request = new Request('http://dataservice.accuweather.com/currentconditions/v1/', {
-      method: 'GET',
-      headers: new Headers({
-        Accept: 'application/json',
-        'Content-Type': 'appliaction/json',
-      }),
-    })
-    
+    const request = 'http://dataservice.accuweather.com/currentconditions/v1/'
     const query = `${cityKey}?apikey=${keyApi}`;
-    const response = await fetch(request.url + query)
-    console.log(response)
+    const response = await fetch(request + query)
+
     const data = await response.json()
-    console.log(data)
+    const details = new Object(data[0])
+    // console.log(data)
     
+    return details
   }
-  
-  useEffect((city) => {
-    getCity((city)=>{
-      getWeather(cityKey);
-    });
+
+  getCity()
+    .then((data)=>{return getWeather(data)})
+    .then(data=>{setDetail(data)})
+
+  useEffect(()=>{
     
-  }, [])
+  },[])
 
   return (
     <>
     <div className="">
       <header className="App-header">
-      <div class="container my-5 mx-auto">
+      <div className="container my-5 mx-auto">
 
-      <h1 class="text-muted text-center my-4">Weather</h1>
+      <h1 className="text-muted text-center my-4">Weather</h1>
 
-      <form class="change-location my-4 text-center text-muted">
-        <label for="city">Enter a location for weather information</label>
-        <input type="text" name="city" class="form-control p-4" onChange={(event)=>{console.log(event.target.value);setCity(event.target.value);console.log(city)}}/>
+      <form className="change-location my-4 text-center text-muted">
+        <label htmlFor="city">Enter a location for weather information</label>
+        <input type="text" name="city" className="form-control p-4" onChange={(event)=>{setCity(event.target.value)}}/>
       </form>
 
-      <div class="card shadow-lg rounded">
-        <img src="https://via.placeholder.com/400x300" class="time card-img-top" alt=''/>
-        <div class="icon bg-light mx-auto text-center">
+      <div className="card shadow-lg rounded">
+        <img src="https://via.placeholder.com/400x300" className="time card-img-top" alt=''/>
+        <div className="icon bg-light mx-auto text-center">
           
-        </div>
-        <div class="text-muted text-uppercase text-center details">
-          <h5 class="my-3">{city}</h5>
-          <div class="my-3">Weather condition</div>
-          <div class="display-4 my-4">
-            <span>temp</span>
-            <span>&deg;C</span>
-          </div>
+      </div>
+      <div className="text-muted text-uppercase text-center details">
+        <h5 className="my-3">{city}</h5>
+        <div className="my-3">{detail.WeatherIcon}</div>
+        <div className="display-4 my-4">
+          <span>temp</span>
+          <span>&deg;C</span>
         </div>
       </div>
-
-      </div> 
-        
+      </div>
+      </div>   
       </header>
     </div>
     </>
